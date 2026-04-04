@@ -1,0 +1,28 @@
+{
+    "name": "my-screeps-bot",
+    "version": "1.0.0",
+    "type": "module",
+    "scripts": {
+        "build": "esbuild src/main.ts --bundle --outdir=dist --format=cjs --platform=node --target=node24",
+        "upload": "ts-node upload.ts",
+        "push": "yarn build && yarn upload",
+        "push:local": "yarn build && yarn upload local",
+        "push:ptr": "yarn build && yarn upload ptr",
+        "watch": "ts-node builder.ts",
+        "watch:local": "ts-node builder.ts local",
+        "watch:ptr": "ts-node builder.ts ptr"
+    },
+    "devDependencies": {
+        "@types/node": "^22.0.0",
+        "@types/screeps": "^3.3.8",
+        "dotenv": "^16.4.0",
+        "esbuild": "^0.25.0",
+        "node-fetch": "^3.3.2",
+        "prettier": "^3.8.1",
+        "ts-node": "^10.9.2",
+        "typescript": "^5.6.0"
+    },
+    "dependencies": {
+        "source-map": "^0.7.6"
+    }
+}

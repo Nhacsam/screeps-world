@@ -1,0 +1,26 @@
+mods:
+  - screepsmod-admin-utils
+  - screepsmod-mongo
+
+pinnedPackages:
+  ssri: 8.0.1
+  cacache: 15.3.0
+  passport-steam: 1.0.17
+  minipass-fetch: 2.1.2
+  express-rate-limit: 6.7.0
+
+launcherOptions:
+  autoUpdate: false
+  logConsole: true
+
+serverConfig:
+  map: mmo-shard1 # utils.importMap will be called automatically with this value, see utils.importMap above
+  socketUpdateRate: 200
+  # tickRate: 100
+  # welcomeText: |
+  #   <h1>Welcome</h1>
+  #   <div>Powered by screepsmod-admin-utils</div>
+  # gclToCPU: true
+  # maxCPU: 1000
+  # baseCPU: 100
+  # stepCPU: 10

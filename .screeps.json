@@ -1,0 +1,28 @@
+{
+  "servers": {
+    "local": {
+      "type": "api",
+      "host": "localhost",
+      "port": 21025,
+      "secure": false,
+      "username": "${SCREEPS_LOCAL_USERNAME:-username}",
+      "password": "${SCREEPS_LOCAL_PASSWORD:-password}"
+    },
+    "main": {
+      "type": "api",
+      "host": "screeps.com",
+      "secure": true,
+      "token": "${SCREEPS_TOKEN}"
+    },
+    "ptr": {
+      "type": "api",
+      "host": "screeps.com",
+      "secure": true,
+      "token": "${SCREEPS_PTR_TOKEN}",
+      "ptr": true
+    }
+  },
+  "defaultServer": "local",
+  "branch": "default"
+}
+
