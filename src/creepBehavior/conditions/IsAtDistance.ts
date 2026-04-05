@@ -3,11 +3,11 @@ import { CreepCondition } from '../CreepCondition';
 
 export class IsAtDistance extends CreepCondition {
   constructor(
-    protected memory: NodeMemory,
+    protected getMemory: () => NodeMemory,
     protected agent: Id<Creep>,
     protected distance: number,
   ) {
-    super(memory, agent);
+    super(getMemory, agent);
   }
 
   checkCreep(creep: Creep, context: CreepContext) {

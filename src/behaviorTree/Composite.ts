@@ -3,11 +3,11 @@ import State from './State';
 
 export abstract class Composite<Agent, Context> extends Node<Agent, Context> {
   constructor(
-    memory: NodeMemory,
+    getMemory: () => NodeMemory,
     agent: Agent,
     protected children: Node<Agent, Context>[],
   ) {
-    super(memory, agent);
+    super(getMemory, agent);
   }
   getChildren = () => this.children;
 

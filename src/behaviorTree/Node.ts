@@ -15,10 +15,11 @@ export abstract class Node<Agent, Context> {
   private state = State.READY;
 
   constructor(
-    protected memory: NodeMemory,
+    protected getMemory: () => NodeMemory,
     protected agent: Agent,
   ) {
     const type = this.constructor.name;
+    const memory = getMemory();
     if (!memory.type || memory.type !== type) {
       memory.type = type;
       memory.state = State.READY;
@@ -28,6 +29,10 @@ export abstract class Node<Agent, Context> {
   }
 
   abstract run(context?: Context): State;
+
+  get memory() {
+    return this.getMemory();
+  }
 
   getAgent(): Agent {
     return this.agent;
@@ -44,6 +49,10 @@ export abstract class Node<Agent, Context> {
   }
 
   setState(state: State) {
+    if (this.state === state) {
+      return;
+    }
+
     this.state = state;
     this.memory.state = state;
   }

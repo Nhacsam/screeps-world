@@ -2,11 +2,11 @@ import { CreepCondition } from '../CreepCondition';
 
 export class HasFreeCapacity extends CreepCondition {
   constructor(
-    protected memory: NodeMemory,
+    protected getMemory: () => NodeMemory,
     protected agent: Id<Creep>,
     protected resource?: ResourceConstant,
   ) {
-    super(memory, agent);
+    super(getMemory, agent);
   }
 
   checkCreep(creep: Creep) {

@@ -9,7 +9,7 @@ export class CreepBehaviorTree extends BehaviorTree<Id<Creep>, CreepContext> {
     if (!creep.memory.bt) {
       creep.memory.bt = {};
     }
-    super(creep.memory.bt, creep.id, builder);
+    super(() => Memory.creeps[creep.name]!.bt, creep.id, builder);
   }
 
   step() {

@@ -2,9 +2,9 @@ import { IsAtDistance } from './IsAtDistance';
 
 export class IsNextToTarget extends IsAtDistance {
   constructor(
-    protected memory: NodeMemory,
+    protected getMemory: () => NodeMemory,
     protected agent: Id<Creep>,
   ) {
-    super(memory, agent, 1);
+    super(getMemory, agent, 1);
   }
 }

@@ -3,10 +3,10 @@ import { Node } from './Node';
 
 export abstract class Decorator<A, Context> extends Composite<A, Context> {
   constructor(
-    memory: NodeMemory,
+    getMemory: () => NodeMemory,
     agent: A,
     protected child: Node<A, Context>,
   ) {
-    super(memory, agent, [child]);
+    super(getMemory, agent, [child]);
   }
 }

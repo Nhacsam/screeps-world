@@ -3,11 +3,11 @@ import { CreepCondition } from '../CreepCondition';
 
 export class TargetIsFull extends CreepCondition {
   constructor(
-    protected memory: NodeMemory,
+    protected getMemory: () => NodeMemory,
     protected agent: Id<Creep>,
     protected resource?: ResourceConstant,
   ) {
-    super(memory, agent);
+    super(getMemory, agent);
   }
 
   checkCreep(_creep: Creep, context: CreepContext) {

@@ -6,38 +6,42 @@ import { Decorator } from './Decorator';
 import { Fail, Flip, Succeed, TargetSelector, WithTarget, WithTargetContext } from './decorators';
 import { Node } from './Node';
 
-export type TreeBuilder<Agent, Context = any> = (memory: NodeMemory, agent: Agent) => Node<Agent, Context>;
+export type TreeBuilder<Agent, Context = any> = (getMemory: () => NodeMemory, agent: Agent) => Node<Agent, Context>;
 
 export const action = <Agent, Context, T extends new (...args: any[]) => Action<Agent, Context>>(
   Base: T,
   ...params: any[]
 ): TreeBuilder<Agent, Context> => {
-  return (memory: NodeMemory, agent: Agent) => new Base(memory, agent, ...params);
+  return (getMemory, agent) => new Base(getMemory, agent, ...params);
 };
 
 export const condition = <Agent, Context, T extends new (...args: any[]) => Condition<Agent, Context>>(
   Base: T,
   ...params: any[]
 ): TreeBuilder<Agent, Context> => {
-  return (memory: NodeMemory, agent: Agent) => new Base(memory, agent, ...params);
+  return (getMemory, agent) => new Base(getMemory, agent, ...params);
 };
 
 const wrapComposite = <T extends new (...args: any[]) => Composite<any, any>>(Base: T) => {
   return <Agent, Context>(children: Array<TreeBuilder<Agent, Context>>): TreeBuilder<Agent, Context> =>
-    (memory: NodeMemory, agent: Agent) =>
+    (getMemory, agent) =>
       new Base(
-        memory,
+        getMemory,
         agent,
         children.map((builder, key: number) => {
-          if (!memory.children) {
-            memory.children = {};
-          }
-          const mKey = `c${key}`;
-          if (!memory.children[mKey]) {
-            memory.children[mKey] = {};
-          }
+          const getChildMemory = () => {
+            const memory = getMemory();
+            if (!memory.children) {
+              memory.children = {};
+            }
+            const mKey = `c${key}`;
+            if (!memory.children[mKey]) {
+              memory.children[mKey] = {};
+            }
+            return memory.children[mKey];
+          };
 
-          return builder(memory.children[mKey], agent);
+          return builder(getChildMemory, agent);
         }),
       );
 };
@@ -49,12 +53,16 @@ export const sequence = wrapComposite(Sequence);
 
 const wrapDecorator = <T extends new (...args: any[]) => Decorator<any, any>>(Base: T) => {
   return <Agent, Context>(child: TreeBuilder<Agent, Context>, ...params: any[]): TreeBuilder<Agent, Context> =>
-    (memory: NodeMemory, agent: Agent) => {
-      if (!memory.child) {
-        memory.child = {};
-      }
+    (getMemory, agent) => {
+      const getChildMemory = () => {
+        const memory = getMemory();
+        if (!memory.child) {
+          memory.child = {};
+        }
+        return memory.child;
+      };
 
-      return new Base(memory, agent, child(memory.child, agent), ...params);
+      return new Base(getMemory, agent, child(getChildMemory, agent), ...params);
     };
 };
 
@@ -66,11 +74,15 @@ export const withTarget = <Agent, Context extends WithTargetContext>(
   selector: TargetSelector<Agent, Context>,
   child: TreeBuilder<Agent, Context>,
 ): TreeBuilder<Agent, Context> => {
-  return (memory: NodeMemory, agent: Agent) => {
-    if (!memory.child) {
-      memory.child = {};
-    }
+  return (getMemory, agent) => {
+    const getChildMemory = () => {
+      const memory = getMemory();
+      if (!memory.child) {
+        memory.child = {};
+      }
+      return memory.child;
+    };
 
-    return new WithTarget<Agent, Context>(memory, agent, child(memory.child, agent), selector);
+    return new WithTarget<Agent, Context>(getMemory, agent, child(getChildMemory, agent), selector);
   };
 };

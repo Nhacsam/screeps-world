@@ -3,11 +3,11 @@ import { CreepAction } from '../CreepAction';
 
 export class MoveToTarget extends CreepAction {
   constructor(
-    memory: NodeMemory,
+    getMemory: () => NodeMemory,
     agent: Id<Creep>,
     protected dist: number = 1,
   ) {
-    super(memory, agent);
+    super(getMemory, agent);
   }
 
   runCreep(creep: Creep, context: CreepContext) {

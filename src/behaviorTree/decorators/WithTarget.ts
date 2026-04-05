@@ -21,12 +21,13 @@ export class WithTarget<Agent, Context extends WithTargetContext> extends Decora
   private target?: Id<any> | RoomPosition;
 
   constructor(
-    memory: NodeMemory,
+    getMemory: () => NodeMemory,
     agent: Agent,
     protected child: Node<Agent, Context>,
     protected targetSelector: TargetSelector<Agent, Context>,
   ) {
-    super(memory, agent, child);
+    super(getMemory, agent, child);
+    const memory = getMemory();
     if (memory.target) {
       this.target = this.deserialize(memory.target);
     }

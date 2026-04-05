@@ -1,16 +1,12 @@
 import { State } from './State';
-import { Node, NodeMemory } from './Node';
+import { Node } from './Node';
 import { TreeBuilder } from './wrappers';
 
 export class BehaviorTree<A, Context> {
   private rootNode: Node<A, Context>;
 
-  constructor(
-    protected memory: NodeMemory,
-    agent: A,
-    builder: TreeBuilder<A, Context>,
-  ) {
-    this.rootNode = builder(memory, agent);
+  constructor(getMemory: () => NodeMemory, agent: A, builder: TreeBuilder<A, Context>) {
+    this.rootNode = builder(getMemory, agent);
   }
 
   public isRunning(): boolean {
