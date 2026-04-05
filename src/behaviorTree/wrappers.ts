@@ -3,7 +3,7 @@ import { Composite } from './Composite';
 import { All, Parallel, Selector, Sequence } from './composites';
 import { Condition } from './Condition';
 import { Decorator } from './Decorator';
-import { Fail, Flip, Succeed, WithTarget } from './decorators';
+import { Fail, Flip, Succeed, TargetSelector, WithTarget, WithTargetContext } from './decorators';
 import { Node } from './Node';
 
 export type TreeBuilder<Agent, Context = any> = (memory: NodeMemory, agent: Agent) => Node<Agent, Context>;
@@ -17,12 +17,13 @@ export const action = <Agent, Context, T extends new (...args: any[]) => Action<
 
 export const condition = <Agent, Context, T extends new (...args: any[]) => Condition<Agent, Context>>(
   Base: T,
+  ...params: any[]
 ): TreeBuilder<Agent, Context> => {
-  return (memory: NodeMemory, agent: Agent) => new Base(memory, agent);
+  return (memory: NodeMemory, agent: Agent) => new Base(memory, agent, ...params);
 };
 
-const wrapComposite = <Agent, Context, T extends new (...args: any[]) => Composite<Agent, Context>>(Base: T) => {
-  return (children: Array<TreeBuilder<Agent>>): TreeBuilder<Agent, Context> =>
+const wrapComposite = <T extends new (...args: any[]) => Composite<any, any>>(Base: T) => {
+  return <Agent, Context>(children: Array<TreeBuilder<Agent, Context>>): TreeBuilder<Agent, Context> =>
     (memory: NodeMemory, agent: Agent) =>
       new Base(
         memory,
@@ -46,8 +47,8 @@ export const parallel = wrapComposite(Parallel);
 export const selector = wrapComposite(Selector);
 export const sequence = wrapComposite(Sequence);
 
-const wrapDecorator = <Agent, Context, T extends new (...args: any[]) => Decorator<Agent, Context>>(Base: T) => {
-  return (child: TreeBuilder<Agent>, ...params: any[]): TreeBuilder<Agent, Context> =>
+const wrapDecorator = <T extends new (...args: any[]) => Decorator<any, any>>(Base: T) => {
+  return <Agent, Context>(child: TreeBuilder<Agent, Context>, ...params: any[]): TreeBuilder<Agent, Context> =>
     (memory: NodeMemory, agent: Agent) => {
       if (!memory.child) {
         memory.child = {};
@@ -60,4 +61,16 @@ const wrapDecorator = <Agent, Context, T extends new (...args: any[]) => Decorat
 export const fail = wrapDecorator(Fail);
 export const flip = wrapDecorator(Flip);
 export const succeed = wrapDecorator(Succeed);
-export const withTarget = wrapDecorator(WithTarget);
+
+export const withTarget = <Agent, Context extends WithTargetContext>(
+  selector: TargetSelector<Agent, Context>,
+  child: TreeBuilder<Agent, Context>,
+): TreeBuilder<Agent, Context> => {
+  return (memory: NodeMemory, agent: Agent) => {
+    if (!memory.child) {
+      memory.child = {};
+    }
+
+    return new WithTarget<Agent, Context>(memory, agent, child(memory.child, agent), selector);
+  };
+};

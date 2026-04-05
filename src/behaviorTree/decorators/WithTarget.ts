@@ -12,6 +12,11 @@ declare global {
   }
 }
 
+export type TargetSelector<Agent, Context extends WithTargetContext> = (
+  agent: Agent,
+  context?: Context,
+) => Id<any> | RoomPosition | undefined;
+
 export class WithTarget<Agent, Context extends WithTargetContext> extends Decorator<Agent, Context> {
   private target?: Id<any> | RoomPosition;
 
@@ -19,7 +24,7 @@ export class WithTarget<Agent, Context extends WithTargetContext> extends Decora
     memory: NodeMemory,
     agent: Agent,
     protected child: Node<Agent, Context>,
-    protected targetSelector: (agent: Agent, context?: Context) => Id<any> | RoomPosition | undefined,
+    protected targetSelector: TargetSelector<Agent, Context>,
   ) {
     super(memory, agent, child);
     if (memory.target) {

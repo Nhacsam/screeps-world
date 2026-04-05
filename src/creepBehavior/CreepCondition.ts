@@ -5,12 +5,12 @@ export abstract class CreepCondition extends Condition<Id<Creep>, CreepContext> 
     return Game.getObjectById(this.getAgent());
   }
 
-  check() {
+  check(context: CreepContext) {
     const creep = this.creep;
     if (!creep) return false;
 
-    return this.checkCreep(creep);
+    return this.checkCreep(creep, context);
   }
 
-  abstract checkCreep(creep: Creep): boolean;
+  abstract checkCreep(creep: Creep, context: CreepContext): boolean;
 }
