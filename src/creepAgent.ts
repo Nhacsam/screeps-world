@@ -1,10 +1,16 @@
 import { sequence, action, withTarget, selector, condition } from './behaviorTree';
-import { Harvest } from './creepBehavior/actions/Harvest';
-import { MoveToTarget } from './creepBehavior/actions/MoveToTarget';
-import { TransferEnergy } from './creepBehavior/actions/TransferEnergy';
-import { HasFreeCapacity, HasUsedCapacity } from './creepBehavior/conditions';
-import { CreepBehaviorTree } from './creepBehavior/CreepBehaviorTree';
-import { nearest } from './creepBehavior/targets/nearest';
+import {
+  TransferEnergy,
+  MoveToTarget,
+  Harvest,
+  HasFreeCapacity,
+  HasUsedCapacity,
+  CreepBehaviorTree,
+  nearest,
+  roomController,
+} from './creepBehavior';
+import { UpgradeController } from './creepBehavior/actions/UpgradeController';
+import { TargetHasFreeCapacity } from './creepBehavior/conditions/TargetHasFreeCapacity';
 
 declare global {
   interface CreepMemory {
@@ -26,8 +32,17 @@ const buildWorkerTree = selector([
     nearest(FIND_MY_SPAWNS),
     sequence([
       condition(HasUsedCapacity, RESOURCE_ENERGY),
+      condition(TargetHasFreeCapacity),
       action(MoveToTarget),
       action(TransferEnergy),
+    ]),
+  ),
+  withTarget(
+    roomController(),
+    sequence([
+      condition(HasUsedCapacity, RESOURCE_ENERGY),
+      action(MoveToTarget, 3),
+      action(UpgradeController),
     ]),
   ),
 ])

@@ -66,6 +66,10 @@ export class WithTarget<Agent, Context extends WithTargetContext> extends Decora
     this.target = target;
     this.memory.target = this.serialize(target);
   }
+  reset(): void {
+    super.reset();
+    this.setTarget(undefined);
+  }
 
   serialize(target?: Id<any> | RoomPosition): Id<any> | { x: number; y: number; room: string } | undefined {
     if (!target) {
