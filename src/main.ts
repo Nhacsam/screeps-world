@@ -1,15 +1,23 @@
 import { runCreep, cleanupDeadCreeps } from './creepAgent';
 import { CityInfo } from './room/CityInfo';
-import { ROLES, workerRole, harvesterRequirement, haulerRequirement } from './roles';
+import { RoomPlanner, initRoomPlanMemory } from './room/RoomPlanner';
+import { center as centerStamp } from './room/stamps/center';
+import { flowerExtension as flowerStamp } from './room/stamps/flowerExtension';
+import { controller as controllerStamp } from './room/stamps/controller';
+import { ROLES, workerRole } from './roles';
 import { SpawnManager } from './spawn/SpawnManager';
 import { FixedCount } from './spawnRequirements/FixedCount';
 import { SourceExtraction } from './spawnRequirements/SourceExtraction';
+import './utils/RoomVisual.js';
 
 // @ts-ignore
 console.log('<span style="color:#88ffff">Refreshed !</span>');
 
 let cityInfo: CityInfo | null = null;
 let spawnManager: SpawnManager | null = null;
+let roomPlanner: RoomPlanner | null = null;
+
+delete Memory.roomPlans;
 
 export const loop = () => {
   // Initialize once on first tick (or after a code reload)
@@ -20,6 +28,13 @@ export const loop = () => {
   } else {
     cityInfo.update();
   }
+
+  if (!roomPlanner) {
+    const roomName = Object.values(Game.spawns)[0]!.room.name;
+    initRoomPlanMemory(roomName);
+    roomPlanner = new RoomPlanner(roomName, cityInfo, [controllerStamp, centerStamp, flowerStamp]);
+  }
+  roomPlanner.update();
 
   if (!spawnManager) {
     spawnManager = new SpawnManager(
