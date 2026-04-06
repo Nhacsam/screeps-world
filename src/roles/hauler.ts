@@ -16,14 +16,13 @@ import {
   IsFull,
 } from '../creepBehavior';
 import { Role } from './Role';
-import { SerializedPos } from '../utils/pos';
 import { cityCenter } from '../creepBehavior/targets/cityCenter';
 import { droppedAroundAssignment } from '../creepBehavior/targets/droppedAroundAssignment';
 import { AssignmentIsInAnotherRoom } from '../creepBehavior/conditions/AssignmentIsInAnotherRoom';
 
 export interface HaulerAssignment {
   sourceId: string;
-  pos: SerializedPos;
+  pos: RoomCoord;
 }
 
 const transferEnergyToTarget = sequence<Id<Creep>, CreepContext>([

@@ -1,4 +1,4 @@
-import { SerializedPos, toPos, fromPos, isWalkable } from '../utils/pos';
+import { toPos, fromPos, isWalkable } from '../utils/pos';
 import { SerializedSourceInfo, SourceInfos, deserializeSource, serializeSource } from './SourceInfo';
 
 declare global {
@@ -14,8 +14,8 @@ declare global {
     roomDistances: Record<string, number>;
     sources: SerializedSourceInfo[];
     mineral?: SerializedSourceInfo;
-    center?: SerializedPos;
-    upgradeControllerPreferredPositions: SerializedPos[];
+    center?: RoomCoord;
+    upgradeControllerPreferredPositions: RoomCoord[];
     lastRoomsUpdate: Record<string, number>;
   }
 }

@@ -1,0 +1,242 @@
+import { Stamp } from './Stamp';
+
+export const center: Stamp = {
+  anchor: { x: 18, y: 13 },
+  size: { x: 5, y: 5 },
+  roadsCanOverlap: true,
+
+  steps: [
+    {
+      rcl: 1,
+      buildings: {
+        spawn: [{ x: 19, y: 12 }],
+      },
+    },
+    {
+      rcl: 2,
+      buildings: {
+        spawn: [{ x: 19, y: 12 }],
+        container: [{ x: 18, y: 13 }],
+        extension: [
+          { x: 19, y: 14 },
+          { x: 20, y: 13 },
+          { x: 18, y: 12 },
+          { x: 18, y: 14 },
+          { x: 20, y: 14 },
+        ],
+      },
+      operators: [
+        {
+          coord: { x: 19, y: 13 },
+          role: 'centerOperator',
+        },
+      ],
+    },
+    {
+      rcl: 3,
+      buildings: {
+        spawn: [{ x: 19, y: 12 }],
+        container: [{ x: 18, y: 13 }],
+        road: [
+          { x: 17, y: 12 },
+          { x: 18, y: 11 },
+          { x: 20, y: 11 },
+          { x: 21, y: 12 },
+          { x: 21, y: 14 },
+          { x: 17, y: 14 },
+          { x: 18, y: 15 },
+          { x: 19, y: 11 },
+          { x: 21, y: 13 },
+          { x: 17, y: 13 },
+          { x: 19, y: 15 },
+          { x: 20, y: 15 },
+        ],
+        extension: [
+          { x: 20, y: 14 },
+          { x: 19, y: 14 },
+          { x: 18, y: 14 },
+          { x: 20, y: 13 },
+          { x: 18, y: 12 },
+        ],
+        tower: [{ x: 20, y: 12 }],
+      },
+      operators: [
+        {
+          coord: { x: 19, y: 13 },
+          role: 'centerOperator',
+        },
+      ],
+    },
+    {
+      rcl: 4,
+      buildings: {
+        spawn: [{ x: 19, y: 12 }],
+        storage: [{ x: 18, y: 13 }],
+        road: [
+          { x: 17, y: 12 },
+          { x: 18, y: 11 },
+          { x: 20, y: 11 },
+          { x: 21, y: 12 },
+          { x: 21, y: 14 },
+          { x: 17, y: 14 },
+          { x: 18, y: 15 },
+          { x: 19, y: 11 },
+          { x: 21, y: 13 },
+          { x: 17, y: 13 },
+          { x: 19, y: 15 },
+          { x: 20, y: 15 },
+        ],
+        extension: [
+          { x: 20, y: 14 },
+          { x: 19, y: 14 },
+          { x: 18, y: 14 },
+          { x: 20, y: 13 },
+          { x: 18, y: 12 },
+        ],
+        tower: [{ x: 20, y: 12 }],
+      },
+      operators: [
+        {
+          coord: { x: 19, y: 13 },
+          role: 'centerOperator',
+        },
+      ],
+    },
+    {
+      rcl: 5,
+      buildings: {
+        spawn: [{ x: 19, y: 12 }],
+        storage: [{ x: 18, y: 13 }],
+        link: [{ x: 18, y: 12 }],
+        road: [
+          { x: 17, y: 12 },
+          { x: 18, y: 11 },
+          { x: 20, y: 11 },
+          { x: 21, y: 12 },
+          { x: 21, y: 14 },
+          { x: 17, y: 14 },
+          { x: 18, y: 15 },
+          { x: 19, y: 11 },
+          { x: 21, y: 13 },
+          { x: 17, y: 13 },
+          { x: 19, y: 15 },
+          { x: 20, y: 15 },
+        ],
+        extension: [
+          { x: 20, y: 14 },
+          { x: 19, y: 14 },
+          { x: 18, y: 14 },
+          { x: 20, y: 13 },
+        ],
+        tower: [{ x: 20, y: 12 }],
+      },
+      operators: [
+        {
+          coord: { x: 19, y: 13 },
+          role: 'centerOperator',
+        },
+      ],
+    },
+    {
+      rcl: 6,
+      buildings: {
+        spawn: [{ x: 19, y: 12 }],
+        storage: [{ x: 18, y: 13 }],
+        link: [{ x: 18, y: 12 }],
+        road: [
+          { x: 17, y: 12 },
+          { x: 18, y: 11 },
+          { x: 20, y: 11 },
+          { x: 21, y: 12 },
+          { x: 21, y: 14 },
+          { x: 17, y: 14 },
+          { x: 18, y: 15 },
+          { x: 19, y: 11 },
+          { x: 21, y: 13 },
+          { x: 17, y: 13 },
+          { x: 19, y: 15 },
+          { x: 20, y: 15 },
+        ],
+        extension: [
+          { x: 20, y: 14 },
+          { x: 19, y: 14 },
+          { x: 18, y: 14 },
+        ],
+        terminal: [{ x: 20, y: 13 }],
+        tower: [{ x: 20, y: 12 }],
+      },
+      operators: [
+        {
+          coord: { x: 19, y: 13 },
+          role: 'centerOperator',
+        },
+      ],
+    },
+    {
+      rcl: 7,
+      buildings: {
+        spawn: [{ x: 19, y: 12 }],
+        storage: [{ x: 18, y: 13 }],
+        link: [{ x: 18, y: 12 }],
+        road: [
+          { x: 17, y: 12 },
+          { x: 18, y: 11 },
+          { x: 20, y: 11 },
+          { x: 21, y: 12 },
+          { x: 21, y: 14 },
+          { x: 17, y: 14 },
+          { x: 18, y: 15 },
+          { x: 19, y: 11 },
+          { x: 21, y: 13 },
+          { x: 17, y: 13 },
+          { x: 19, y: 15 },
+          { x: 20, y: 15 },
+        ],
+        extension: [{ x: 20, y: 14 }],
+        terminal: [{ x: 20, y: 13 }],
+        nuker: [{ x: 18, y: 14 }],
+        factory: [{ x: 19, y: 14 }],
+        tower: [{ x: 20, y: 12 }],
+      },
+      operators: [
+        {
+          coord: { x: 19, y: 13 },
+          role: 'centerOperator',
+        },
+      ],
+    },
+    {
+      rcl: 8,
+      buildings: {
+        spawn: [{ x: 19, y: 12 }],
+        storage: [{ x: 18, y: 13 }],
+        link: [{ x: 18, y: 12 }],
+        road: [
+          { x: 17, y: 12 },
+          { x: 18, y: 11 },
+          { x: 20, y: 11 },
+          { x: 21, y: 12 },
+          { x: 21, y: 14 },
+          { x: 17, y: 14 },
+          { x: 18, y: 15 },
+          { x: 19, y: 11 },
+          { x: 21, y: 13 },
+          { x: 17, y: 13 },
+          { x: 19, y: 15 },
+          { x: 20, y: 15 },
+        ],
+        terminal: [{ x: 20, y: 13 }],
+        nuker: [{ x: 18, y: 14 }],
+        powerSpawn: [{ x: 20, y: 14 }],
+        factory: [{ x: 19, y: 14 }],
+        tower: [{ x: 20, y: 12 }],
+      },
+      operators: [
+        {
+          coord: { x: 19, y: 13 },
+          role: 'centerOperator',
+        },
+      ],
+    },
+  ],
+};

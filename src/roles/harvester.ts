@@ -1,11 +1,10 @@
 import { action, sequence, withTarget } from '../behaviorTree';
-import { SerializedPos } from '../utils/pos';
 import { Role } from './Role';
 import { assignedPos, assignedSource, Harvest, MoveToTarget } from '../creepBehavior';
 
 export interface HarvesterAssignment {
   sourceId: string;
-  pos: SerializedPos;
+  pos: RoomCoord;
 }
 
 // prettier-ignore

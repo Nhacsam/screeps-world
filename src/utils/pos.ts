@@ -1,14 +1,33 @@
-export interface SerializedPos {
-  x: number;
-  y: number;
-  room: string;
+declare global {
+  interface Coord {
+    x: number;
+    y: number;
+  }
+
+  interface RoomCoord extends Coord {
+    room: string;
+  }
 }
 
-export function toPos(s: SerializedPos): RoomPosition {
+export const ROOM_DIMENSIONS = 50;
+
+export function packXYAsNum(x: number, y: number) {
+  return x * ROOM_DIMENSIONS + y;
+}
+export function unpackNumAsCoord(packedCoord: number) {
+  return {
+    x: Math.floor(packedCoord / ROOM_DIMENSIONS),
+    y: Math.floor(packedCoord % ROOM_DIMENSIONS),
+  };
+}
+
+export interface RoomCoord {}
+
+export function toPos(s: RoomCoord): RoomPosition {
   return new RoomPosition(s.x, s.y, s.room);
 }
 
-export function fromPos(p: RoomPosition): SerializedPos {
+export function fromPos(p: RoomPosition): RoomCoord {
   return { x: p.x, y: p.y, room: p.roomName };
 }
 
@@ -39,7 +58,5 @@ export function isWalkable(pos: RoomPosition): boolean {
 
   if (room.getTerrain().get(pos.x, pos.y) === TERRAIN_MASK_WALL) return false;
 
-  return !room
-    .lookForAt(LOOK_STRUCTURES, pos.x, pos.y)
-    .some(s => BLOCKING_STRUCTURES.has(s.structureType));
+  return !room.lookForAt(LOOK_STRUCTURES, pos.x, pos.y).some((s) => BLOCKING_STRUCTURES.has(s.structureType));
 }

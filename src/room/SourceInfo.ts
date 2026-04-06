@@ -1,4 +1,4 @@
-import { SerializedPos, toPos, fromPos } from '../utils/pos';
+import { toPos, fromPos } from '../utils/pos';
 
 export interface SourceInfos<SourceType extends _HasId> {
   id: Id<SourceType>;
@@ -14,9 +14,9 @@ export interface SourceInfos<SourceType extends _HasId> {
 export interface SerializedSourceInfo {
   id: string;
   distanceToCenter: number;
-  pos: SerializedPos;
+  pos: RoomCoord;
   maxNumberOfHarvesters: number;
-  harvesterPos: SerializedPos[];
+  harvesterPos: RoomCoord[];
   maxCapacity: number;
   ticksToRegeneration: number;
 }

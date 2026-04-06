@@ -1,7 +1,6 @@
 import { TaskList } from '../taskList';
 import { CityInfo } from '../room/CityInfo';
 import { Role } from '../roles/Role';
-import { SerializedPos } from '../utils/pos';
 import { SpawnRequest } from './SpawnRequest';
 import { RequirementBuilder, SpawnRequirement } from './SpawnRequirement';
 
@@ -15,7 +14,7 @@ declare global {
     bt: NodeMemory;
     // Role-specific optional fields:
     assignedSource?: Id<Source>;
-    assignedPos?: SerializedPos;
+    assignedPos?: RoomCoord;
   }
 }
 
