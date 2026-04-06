@@ -20,6 +20,8 @@ declare global {
   }
 }
 
+const cityInfos: Map<string, CityInfo> = new Map();
+
 /**
  * All rooms at room path distance below this value are included in the City.
  */
@@ -46,6 +48,14 @@ export class CityInfo {
   constructor(private mainRoom: string) {
     this.loadMemory();
     this.update();
+    cityInfos.set(mainRoom, this);
+  }
+
+  static fromRoomName(mainRoom: string): CityInfo {
+    if (cityInfos.has(mainRoom)) {
+      return cityInfos.get(mainRoom)!;
+    }
+    return new CityInfo(mainRoom);
   }
 
   getMainRoomName(): string {
@@ -65,6 +75,18 @@ export class CityInfo {
   }
   getUpgradeControllerPreferredPositions(): RoomPosition[] {
     return this.upgradeControllerPreferredPositions;
+  }
+  getUnexploredRooms(): string[] {
+    return this.unexploredRooms;
+  }
+
+  getNearstUnexploredRoom() {
+    if (!this.unexploredRooms.length) {
+      return undefined;
+    }
+    return this.unexploredRooms
+      .slice()
+      .sort((a, b) => (this.roomDistances[a] ?? Infinity) - (this.roomDistances[b] ?? Infinity))[0]!;
   }
 
   getController(): StructureController {

@@ -1,32 +1,30 @@
 import { runCreep, cleanupDeadCreeps } from './creepAgent';
 import { CityInfo } from './room/CityInfo';
+import { ROLES, workerRole, harvesterRequirement, haulerRequirement } from './roles';
+import { SpawnManager } from './spawn/SpawnManager';
+import { fixedCount } from './spawn/SpawnRequirement';
 
 // @ts-ignore
 console.logUnsafe('<span style="color:#88ffff">Refreshed !</span>');
 
-const HARVESTER_BODY: BodyPartConstant[] = [WORK, CARRY, MOVE];
-const MAX_HARVESTERS = 10;
-
 let cityInfo: CityInfo | null = null;
+let spawnManager: SpawnManager | null = null;
 
 export const loop = () => {
+  // Initialize once on first tick (or after a code reload)
   if (!cityInfo) {
     const spawn = Object.values(Game.spawns)[0];
-    cityInfo = new CityInfo(spawn!.pos.roomName);
+    if (!spawn) return;
+    cityInfo = new CityInfo(spawn.room.name);
+  } else {
+    cityInfo.update();
   }
 
-  // Spawn creeps when the spawn is not busy
-  for (const spawnName in Game.spawns) {
-    const spawn = Game.spawns[spawnName]!;
-    if (spawn.spawning) continue;
-
-    const harvesterCount = Object.values(Game.creeps).filter((c) => c.memory.role === 'harvester').length;
-
-    if (harvesterCount < MAX_HARVESTERS) {
-      const name = `Harvester${Game.time}`;
-      spawn.spawnCreep(HARVESTER_BODY, name, { memory: { role: 'harvester' } as CreepMemory });
-    }
+  if (!spawnManager) {
+    spawnManager = new SpawnManager(cityInfo, [fixedCount(workerRole, 2, 1), harvesterRequirement(2), haulerRequirement(2)], ROLES);
   }
+
+  spawnManager.update();
 
   // Run behavior tree for each creep
   for (const name in Game.creeps) {

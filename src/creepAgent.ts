@@ -1,58 +1,13 @@
-import { sequence, action, withTarget, selector, condition } from './behaviorTree';
-import {
-  TransferEnergy,
-  MoveToTarget,
-  Harvest,
-  HasFreeCapacity,
-  HasUsedCapacity,
-  CreepBehaviorTree,
-  nearest,
-  roomController,
-} from './creepBehavior';
-import { UpgradeController } from './creepBehavior/actions/UpgradeController';
-import { TargetHasFreeCapacity } from './creepBehavior/conditions/TargetHasFreeCapacity';
-
-declare global {
-  interface CreepMemory {
-    bt: NodeMemory;
-  }
-}
-
-// prettier-ignore
-const buildWorkerTree = selector([
-  withTarget(
-    nearest(FIND_SOURCES),
-    sequence([
-      condition(HasFreeCapacity),
-      action(MoveToTarget),
-      action(Harvest),
-    ]),
-  ),
-  withTarget(
-    nearest(FIND_MY_SPAWNS),
-    sequence([
-      condition(HasUsedCapacity, RESOURCE_ENERGY),
-      condition(TargetHasFreeCapacity),
-      action(MoveToTarget),
-      action(TransferEnergy),
-    ]),
-  ),
-  withTarget(
-    roomController(),
-    sequence([
-      condition(HasUsedCapacity, RESOURCE_ENERGY),
-      action(MoveToTarget, 3),
-      action(UpgradeController),
-    ]),
-  ),
-])
+import { CreepBehaviorTree } from './creepBehavior';
+import { ROLES, workerRole } from './roles';
 
 const treesById = new Map<string, CreepBehaviorTree>();
 
 export function runCreep(creep: Creep) {
   if (!treesById.has(creep.id)) {
-    const tree = new CreepBehaviorTree(creep, buildWorkerTree);
-    treesById.set(creep.id, tree);
+    // Legacy creeps (no city in memory) and unknown roles fall back to the worker tree.
+    const role = creep.memory.city ? (ROLES.get(creep.memory.role) ?? workerRole) : workerRole;
+    treesById.set(creep.id, new CreepBehaviorTree(creep, role.buildTree));
   }
   treesById.get(creep.id)!.step();
 }
@@ -65,8 +20,7 @@ export function cleanupDeadCreeps() {
   }
 
   for (const name in Memory.creeps) {
-    const creep = Game.creeps[name];
-    if (!creep) {
+    if (!Game.creeps[name]) {
       delete Memory.creeps[name];
     }
   }

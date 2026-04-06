@@ -1,25 +1,23 @@
 import { State, WithTarget } from '../../behaviorTree';
 import { CreepAction } from '../CreepAction';
 
-export class MoveToTarget extends CreepAction {
-  constructor(
-    getMemory: () => NodeMemory,
-    agent: Id<Creep>,
-    protected dist: number = 1,
-  ) {
-    super(getMemory, agent);
-  }
-
+export class MoveToTargetRoom extends CreepAction {
   runCreep(creep: Creep, context: CreepContext) {
     const target = WithTarget.resolveTarget(context.target);
 
-    if (creep.pos.getRangeTo(target) <= this.dist) {
+    if (!target) {
+      return State.FAILED;
+    }
+
+    const targetRoomName = target instanceof RoomPosition ? target.roomName : target.pos.roomName;
+
+    if (creep.room.name === targetRoomName) {
       return State.SUCCEEDED;
     }
 
-    const res = creep.moveTo(target, {
-      visualizePathStyle: { stroke: '#00ffff' },
-      range: this.dist,
+    const res = creep.moveTo(new RoomPosition(25, 25, targetRoomName), {
+      visualizePathStyle: { stroke: '#ffaa00' },
+      range: 20,
       reusePath: 10,
     });
 
