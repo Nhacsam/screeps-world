@@ -4,6 +4,8 @@ export interface SpawnRequest {
   role: string;
   assignmentKey: string;
   assignment: any;
+  bodyParts: BodyPartConstant[];
+  energyRequirement: number;
 }
 
 declare global {

@@ -7,6 +7,8 @@ export interface SourceInfos<SourceType extends _HasId> {
   maxNumberOfHarvesters: number;
   /** All walkable tiles at range 1 from the source. */
   harvesterPos: RoomPosition[];
+  maxCapacity: number;
+  ticksToRegeneration: number;
 }
 
 export interface SerializedSourceInfo {
@@ -15,6 +17,8 @@ export interface SerializedSourceInfo {
   pos: SerializedPos;
   maxNumberOfHarvesters: number;
   harvesterPos: SerializedPos[];
+  maxCapacity: number;
+  ticksToRegeneration: number;
 }
 
 export function serializeSource<T extends _HasId>(s: SourceInfos<T>): SerializedSourceInfo {
@@ -24,6 +28,8 @@ export function serializeSource<T extends _HasId>(s: SourceInfos<T>): Serialized
     pos: fromPos(s.pos),
     maxNumberOfHarvesters: s.maxNumberOfHarvesters,
     harvesterPos: s.harvesterPos.map(fromPos),
+    maxCapacity: s.maxCapacity,
+    ticksToRegeneration: s.ticksToRegeneration,
   };
 }
 
@@ -34,5 +40,7 @@ export function deserializeSource<T extends _HasId>(s: SerializedSourceInfo): So
     pos: toPos(s.pos),
     maxNumberOfHarvesters: s.maxNumberOfHarvesters,
     harvesterPos: s.harvesterPos.map(toPos),
+    maxCapacity: s.maxCapacity,
+    ticksToRegeneration: s.ticksToRegeneration,
   };
 }

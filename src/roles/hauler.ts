@@ -7,16 +7,15 @@ import {
   assignedPos,
   assignedSource as _assignedSource,
   Pickup,
-  nearest,
   TargetHasFreeCapacity,
   nearestSpawnEnergyNeed,
   nearestCreepEnergyNeed,
   IsEmpty,
-  nearestAroundAssignment,
   MoveToTargetRoom,
   NotInCityMainRoom,
+  IsFull,
 } from '../creepBehavior';
-import { Role, scaleBody } from './Role';
+import { Role } from './Role';
 import { SerializedPos } from '../utils/pos';
 import { cityCenter } from '../creepBehavior/targets/cityCenter';
 import { droppedAroundAssignment } from '../creepBehavior/targets/droppedAroundAssignment';
@@ -26,9 +25,6 @@ export interface HaulerAssignment {
   sourceId: string;
   pos: SerializedPos;
 }
-
-const UNIT: BodyPartConstant[] = [CARRY, CARRY, MOVE];
-const MAX_UNITS = 4;
 
 const transferEnergyToTarget = sequence<Id<Creep>, CreepContext>([
   condition(HasUsedCapacity, RESOURCE_ENERGY),
@@ -70,6 +66,7 @@ const tree = selector<Id<Creep>, CreepContext>([
 
   sequence([
     condition(NotInCityMainRoom),
+    condition(HasUsedCapacity),
     withTarget(
       cityCenter(),
       action(MoveToTargetRoom),
@@ -85,17 +82,23 @@ const tree = selector<Id<Creep>, CreepContext>([
     transferEnergyToTarget,
   ),
   sequence([
-    condition(HasUsedCapacity),
+    condition(IsFull),
     withTarget(
       cityCenter(),
-      action(MoveToTarget, 10),
+      action(MoveToTarget, 6),
+    ),
+  ]),
+  sequence([
+    condition(AssignmentIsInAnotherRoom),
+    withTarget(
+      assignedPos(),
+      action(MoveToTargetRoom),
     ),
   ]),
 ]);
 
 export const haulerRole: Role<HaulerAssignment> = {
   name: 'hauler',
-  buildBody: (energy) => scaleBody(UNIT, energy, MAX_UNITS),
   buildTree: tree,
   buildMemory: (assignment) => ({
     assignedSource: assignment.sourceId as Id<Source>,

@@ -64,6 +64,12 @@ export class TaskList<T> {
     return task;
   }
 
+  getFirstTask() {
+    const task = this.getPending()[0];
+    if (!task) return undefined;
+    return task;
+  }
+
   /**
    * Reserve the highest-priority PENDING task for an agent.
    * If the agent already holds a task, that task is returned instead.

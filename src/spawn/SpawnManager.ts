@@ -75,7 +75,13 @@ export class SpawnManager {
       if (queued) continue;
 
       this.queue.add(
-        { role: req.role.name, assignmentKey: req.assignmentKey, assignment: req.assignment },
+        {
+          role: req.role.name,
+          assignmentKey: req.assignmentKey,
+          assignment: req.assignment,
+          bodyParts: req.bodyParts,
+          energyRequirement: req.energyRequirement,
+        },
         req.priority,
       );
     }
@@ -89,8 +95,14 @@ export class SpawnManager {
       if (spawn.spawning) continue;
       if (spawn.room.name !== cityName) continue;
 
-      const task = this.queue.reserve(spawnName);
+      const task = this.queue.getFirstTask();
       if (!task) continue;
+
+      if (spawn.room.energyAvailable < (task.data.energyRequirement || 300)) {
+        continue;
+      }
+
+      this.queue.reserveById(task.id, spawnName);
 
       const role = this.roles.get(task.data.role);
       if (!role) {
@@ -99,7 +111,7 @@ export class SpawnManager {
       }
 
       const assignment = task.data.assignment;
-      const body = role.buildBody(spawn.room.energyAvailable);
+      const body = task.data.bodyParts;
       const name = `${task.data.role}-${Game.time}`;
       const memory: CreepMemory = {
         ...role.buildMemory(assignment, cityName),

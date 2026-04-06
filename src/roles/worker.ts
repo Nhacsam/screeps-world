@@ -15,7 +15,8 @@ import {
   UpgradeController,
   TargetHasFreeCapacity,
 } from '../creepBehavior';
-import { Role, scaleBody } from './Role';
+import { scaleBody } from '../spawnRequirements/scaleBody';
+import { Role } from './Role';
 
 const UNIT: BodyPartConstant[] = [WORK, CARRY, MOVE];
 const MAX_UNITS = 5;

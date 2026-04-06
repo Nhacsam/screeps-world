@@ -79,6 +79,9 @@ export class CityInfo {
   getUnexploredRooms(): string[] {
     return this.unexploredRooms;
   }
+  getEnergyCapacityAvailable(): number {
+    return Game.rooms[this.mainRoom]!.energyCapacityAvailable;
+  }
 
   getNearstUnexploredRoom() {
     if (!this.unexploredRooms.length) {
@@ -191,6 +194,8 @@ export class CityInfo {
         maxNumberOfHarvesters: harvesterPos.length,
         harvesterPos,
         distanceToCenter: this.distanceToCenter(source.pos),
+        maxCapacity: source.energyCapacity,
+        ticksToRegeneration: source.ticksToRegeneration,
       });
     }
   }
@@ -207,6 +212,8 @@ export class CityInfo {
       maxNumberOfHarvesters: harvesterPos.length,
       harvesterPos,
       distanceToCenter: this.distanceToCenter(mineral.pos),
+      maxCapacity: MINERAL_DENSITY[mineral.density] ?? 0,
+      ticksToRegeneration: mineral.ticksToRegeneration ?? Infinity,
     };
   }
 

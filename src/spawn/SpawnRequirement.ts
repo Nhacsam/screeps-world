@@ -6,6 +6,8 @@ export interface SpawnRequirement<TAssignment = any> {
   priority: number;
   assignment: TAssignment;
   assignmentKey: string;
+  bodyParts: BodyPartConstant[];
+  energyRequirement: number;
 }
 
 export interface RequirementBuilder<TAssignement> {
