@@ -1,6 +1,7 @@
 export * from './assignedPos';
 export * from './assignedSource';
 export * from './nearest';
+export * from './nearestAroundAssignment';
 export * from './nearestCreepEnergyNeed';
 export * from './nearestSpawnEnergyNeed';
 export * from './nearestUnexploredRoom';

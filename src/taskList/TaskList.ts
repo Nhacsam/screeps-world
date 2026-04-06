@@ -1,7 +1,7 @@
 import { Task, TaskListMemory } from './Task';
 import { TaskState } from './TaskState';
 
-const DEFAULT_RESERVATION_TTL = 100;
+const DEFAULT_RESERVATION_TTL = 10;
 
 /**
  * Generic persistent task queue with an in-process cache.
@@ -13,20 +13,22 @@ const DEFAULT_RESERVATION_TTL = 100;
  *   const haulQueue = new TaskList(() => Memory.haulQueue);
  */
 export class TaskList<T> {
-  private tasks: Record<string, Task<T>>;
-  private nextId: number;
+  private tasks: Record<string, Task<T>> = {};
+  private nextId: number = 0;
 
   /**
    * @param getMemory       Factory called on each apply() to get the fresh Memory slice.
    * @param reservationTTL  Ticks before an unfinished reservation is stale. Default: 100.
    */
   constructor(
-    private getMemory: () => TaskListMemory<T>,
+    private getMemory?: () => TaskListMemory<T>,
     private reservationTTL: number = DEFAULT_RESERVATION_TTL,
   ) {
-    const memory = getMemory();
-    this.tasks = JSON.parse(JSON.stringify(memory.tasks)) as Record<string, Task<T>>;
-    this.nextId = memory.nextId;
+    if (getMemory) {
+      const memory = getMemory();
+      this.tasks = JSON.parse(JSON.stringify(memory.tasks)) as Record<string, Task<T>>;
+      this.nextId = memory.nextId;
+    }
   }
 
   /**
@@ -34,6 +36,9 @@ export class TaskList<T> {
    * Calls getMemory() to obtain the fresh tick's reference — O(1), no copying.
    */
   apply(): void {
+    if (!this.getMemory) {
+      return;
+    }
     const memory = this.getMemory();
     memory.tasks = this.tasks;
     memory.nextId = this.nextId;

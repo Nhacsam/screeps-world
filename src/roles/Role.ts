@@ -1,6 +1,6 @@
 import { TreeBuilder } from '../behaviorTree';
 
-export interface Role<TAssignment = string> {
+export interface Role<TAssignment = any> {
   readonly name: string;
   buildBody(energyAvailable: number): BodyPartConstant[];
   buildTree: TreeBuilder<Id<Creep>, CreepContext>;

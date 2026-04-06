@@ -3,7 +3,7 @@ import { CityInfo } from '../room/CityInfo';
 import { Role } from '../roles/Role';
 import { SerializedPos } from '../utils/pos';
 import { SpawnRequest } from './SpawnRequest';
-import { SpawnRequirement } from './SpawnRequirement';
+import { RequirementBuilder, SpawnRequirement } from './SpawnRequirement';
 
 declare global {
   interface CreepMemory {
@@ -24,17 +24,15 @@ export class SpawnManager {
 
   constructor(
     private city: CityInfo,
-    private requirements: SpawnRequirement<any>[],
+    private requirementBuilders: RequirementBuilder<any>[],
     private roles: Map<string, Role<any>>,
   ) {
-    const cityName = city.getMainRoomName();
-    if (!Memory.spawnQueues) Memory.spawnQueues = {};
-    if (!Memory.spawnQueues[cityName]) Memory.spawnQueues[cityName] = { tasks: {}, nextId: 0 };
-    this.queue = new TaskList(() => Memory.spawnQueues[cityName]!);
+    this.queue = new TaskList();
   }
 
   update(): void {
     this.queue.cleanup();
+    // console.log(JSON.stringify(this.queue.all(), undefined, 2));
     this.updateQueue();
     this.processSpawns();
   }
@@ -47,34 +45,39 @@ export class SpawnManager {
     const cityName = this.city.getMainRoomName();
     const aliveCreeps = Object.values(Game.creeps).filter((c) => c.memory.city === cityName);
 
-    // Build the full desired set so we can remove stale queued tasks
-    const desiredKeys = new Set<string>();
-    for (const req of this.requirements) {
-      for (const a of req.getDesiredAssignments(this.city)) {
-        desiredKeys.add(`${req.role.name}:${req.assignmentKey(a)}`);
-      }
+    let requirements: SpawnRequirement[] = [];
+
+    for (const builder of this.requirementBuilders) {
+      const newRequirements = builder.buildRequirement(this.city);
+      if (!newRequirements) continue;
+      requirements = requirements.concat(newRequirements);
     }
+
+    const desiredKeys = new Set<string>(requirements.map((r) => r.assignmentKey));
 
     // Drop queued tasks whose assignment is no longer desired
     for (const task of this.queue.getPending()) {
-      if (!desiredKeys.has(`${task.data.role}:${task.data.assignmentKey}`)) {
+      if (!desiredKeys.has(task.data.assignmentKey)) {
         this.queue.remove(task.id);
       }
     }
 
     // Enqueue missing assignments
-    for (const req of this.requirements) {
-      for (const assignment of req.getDesiredAssignments(this.city)) {
-        const key = req.assignmentKey(assignment);
+    for (const req of requirements) {
+      const fulfilled = aliveCreeps.some(
+        (c) => c.memory.role === req.role.name && c.memory.assignment === req.assignmentKey,
+      );
+      if (fulfilled) continue;
 
-        const fulfilled = aliveCreeps.some((c) => c.memory.role === req.role.name && c.memory.assignment === key);
-        if (fulfilled) continue;
+      const queued = this.queue
+        .all()
+        .some((t) => t.data.role === req.role.name && t.data.assignmentKey === req.assignmentKey);
+      if (queued) continue;
 
-        const queued = this.queue.all().some((t) => t.data.role === req.role.name && t.data.assignmentKey === key);
-        if (queued) continue;
-
-        this.queue.add({ role: req.role.name, assignmentKey: key, assignment }, req.priority);
-      }
+      this.queue.add(
+        { role: req.role.name, assignmentKey: req.assignmentKey, assignment: req.assignment },
+        req.priority,
+      );
     }
   }
 
@@ -82,7 +85,7 @@ export class SpawnManager {
     const cityName = this.city.getMainRoomName();
 
     for (const spawnName in Game.spawns) {
-      const spawn = Game.spawns[spawnName];
+      const spawn = Game.spawns[spawnName]!;
       if (spawn.spawning) continue;
       if (spawn.room.name !== cityName) continue;
 
@@ -107,14 +110,13 @@ export class SpawnManager {
       };
 
       const result = spawn.spawnCreep(body, name, { memory });
-
       if (result === OK) {
         this.queue.markAsDone(task.id);
       } else if (result === ERR_NOT_ENOUGH_ENERGY) {
         this.queue.release(task.id);
       } else {
         this.queue.markAsFailed(task.id);
-        console.error(`[SpawnManager] Failed to spawn ${name}: ${result}`);
+        console.log(`[SpawnManager] Failed to spawn ${name}: ${result}`);
       }
     }
   }

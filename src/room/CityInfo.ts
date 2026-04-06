@@ -163,6 +163,9 @@ export class CityInfo {
     if (currentDistance >= MAX_ROOM_DISTANCE) return;
 
     const exits = Game.map.describeExits(roomName);
+    if (!exits) {
+      return;
+    }
     for (const exitRoom of Object.values(exits)) {
       if (!exitRoom) continue;
       if (this.rooms.includes(exitRoom)) continue;

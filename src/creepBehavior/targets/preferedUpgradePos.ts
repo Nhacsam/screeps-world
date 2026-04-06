@@ -9,11 +9,10 @@ export const preferedUpgradePos =
     }
 
     const cityInfo = CityInfo.fromRoomName(creep.room.name);
-    for (const pos of cityInfo?.getUpgradeControllerPreferredPositions()) {
-      if (pos.lookFor(LOOK_CREEPS).length > 0) {
-        continue;
-      }
-      return pos;
-    }
-    return undefined;
+
+    const candidates = cityInfo
+      ?.getUpgradeControllerPreferredPositions()
+      .filter((pos) => pos.lookFor(LOOK_CREEPS).length === 0);
+
+    return creep.pos.findClosestByPath(candidates) || undefined;
   };

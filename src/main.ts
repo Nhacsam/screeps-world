@@ -2,10 +2,11 @@ import { runCreep, cleanupDeadCreeps } from './creepAgent';
 import { CityInfo } from './room/CityInfo';
 import { ROLES, workerRole, harvesterRequirement, haulerRequirement } from './roles';
 import { SpawnManager } from './spawn/SpawnManager';
-import { fixedCount } from './spawn/SpawnRequirement';
+import { FixedCount } from './spawnRequirements/FixedCount';
+import { SourceExtraction } from './spawnRequirements/SourceExtraction';
 
 // @ts-ignore
-console.logUnsafe('<span style="color:#88ffff">Refreshed !</span>');
+console.log('<span style="color:#88ffff">Refreshed !</span>');
 
 let cityInfo: CityInfo | null = null;
 let spawnManager: SpawnManager | null = null;
@@ -21,7 +22,15 @@ export const loop = () => {
   }
 
   if (!spawnManager) {
-    spawnManager = new SpawnManager(cityInfo, [fixedCount(workerRole, 2, 1), harvesterRequirement(2), haulerRequirement(2)], ROLES);
+    spawnManager = new SpawnManager(
+      cityInfo,
+      [
+        new FixedCount(workerRole, 1, 'main-worker', 100),
+        new SourceExtraction(50),
+        new FixedCount(workerRole, 10, 'slave-worker', 1),
+      ],
+      ROLES,
+    );
   }
 
   spawnManager.update();

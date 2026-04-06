@@ -1,4 +1,4 @@
-import { selector, sequence, action, condition, withTarget } from '../behaviorTree';
+import { selector, sequence, action, condition, withTarget, flip } from '../behaviorTree';
 import {
   TransferEnergy,
   MoveToTarget,
@@ -10,19 +10,21 @@ import {
   nearest,
   TargetHasFreeCapacity,
   nearestSpawnEnergyNeed,
-  IsFull,
   nearestCreepEnergyNeed,
+  IsEmpty,
+  nearestAroundAssignment,
+  MoveToTargetRoom,
+  NotInCityMainRoom,
 } from '../creepBehavior';
-import { CityInfo } from '../room/CityInfo';
-import { fromPos } from '../utils/pos';
 import { Role, scaleBody } from './Role';
-import { SpawnRequirement } from '../spawn/SpawnRequirement';
 import { SerializedPos } from '../utils/pos';
+import { cityCenter } from '../creepBehavior/targets/cityCenter';
+import { droppedAroundAssignment } from '../creepBehavior/targets/droppedAroundAssignment';
+import { AssignmentIsInAnotherRoom } from '../creepBehavior/conditions/AssignmentIsInAnotherRoom';
 
 export interface HaulerAssignment {
   sourceId: string;
   pos: SerializedPos;
-  index: number;
 }
 
 const UNIT: BodyPartConstant[] = [CARRY, CARRY, MOVE];
@@ -36,15 +38,44 @@ const transferEnergyToTarget = sequence<Id<Creep>, CreepContext>([
 ]);
 
 // prettier-ignore
-const tree = selector([
-  withTarget(
-    nearest(FIND_DROPPED_RESOURCES),
-    sequence([
-      condition(HasFreeCapacity),
-      action(MoveToTarget),
-      action(Pickup),
-    ]),
-  ),
+const tree = selector<Id<Creep>, CreepContext>([
+  sequence([
+    condition(IsEmpty),
+    condition(AssignmentIsInAnotherRoom),
+    withTarget(
+      assignedPos(),
+      action(MoveToTarget,2),
+    ),
+  ]),
+  sequence([
+    condition(IsEmpty),
+    condition(AssignmentIsInAnotherRoom),
+    withTarget(
+      assignedPos(),
+      action(MoveToTargetRoom),
+    ),
+  ]),
+
+  sequence([
+    condition(HasFreeCapacity),
+    flip(condition(AssignmentIsInAnotherRoom)),
+    withTarget(
+      droppedAroundAssignment(),
+      sequence([
+        action(MoveToTarget),
+        action(Pickup),
+      ]),
+    ),
+  ]),
+
+  sequence([
+    condition(NotInCityMainRoom),
+    withTarget(
+      cityCenter(),
+      action(MoveToTargetRoom),
+    ),
+  ]),
+
   withTarget(
     nearestSpawnEnergyNeed(),
     transferEnergyToTarget,
@@ -53,17 +84,13 @@ const tree = selector([
     nearestCreepEnergyNeed(),
     transferEnergyToTarget,
   ),
-  withTarget(
-    nearest(FIND_MY_SPAWNS),
-    sequence([
-      condition(IsFull),
-      action(MoveToTarget, 3),
-    ]),
-  ),
-  withTarget(
-    assignedPos(),
-    action(MoveToTarget, 3),
-  ),
+  sequence([
+    condition(HasUsedCapacity),
+    withTarget(
+      cityCenter(),
+      action(MoveToTarget, 10),
+    ),
+  ]),
 ]);
 
 export const haulerRole: Role<HaulerAssignment> = {
@@ -75,20 +102,3 @@ export const haulerRole: Role<HaulerAssignment> = {
     assignedPos: assignment.pos,
   }),
 };
-
-export function haulerRequirement(priority: number = 0): SpawnRequirement<HaulerAssignment> {
-  return {
-    role: haulerRole,
-    priority,
-    getDesiredAssignments: (city: CityInfo) =>
-      city
-        .getAllSources()
-        .filter((s) => s.harvesterPos.length > 0)
-        .reduce<HaulerAssignment[]>((acc, s) => {
-          acc.push({ sourceId: s.id as string, pos: fromPos(s.harvesterPos[0]!), index: 0 });
-          acc.push({ sourceId: s.id as string, pos: fromPos(s.harvesterPos[0]!), index: 1 });
-          return acc;
-        }, []),
-    assignmentKey: (a) => `${a.sourceId}-${a.index}`,
-  };
-}

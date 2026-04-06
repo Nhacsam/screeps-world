@@ -4,6 +4,8 @@ declare global {
   interface CreepContext extends WithTargetContext {}
 }
 
+let debuggedName: string | undefined;
+
 export class CreepBehaviorTree extends BehaviorTree<Id<Creep>, CreepContext> {
   constructor(creep: Creep, builder: TreeBuilder<Id<Creep>>) {
     if (!creep.memory.bt) {
@@ -14,5 +16,18 @@ export class CreepBehaviorTree extends BehaviorTree<Id<Creep>, CreepContext> {
 
   step() {
     super.step({});
+
+    const creep = Game.getObjectById(this.rootNode.getAgent());
+
+    if (creep?.memory.role !== 'hauler') {
+      return;
+    }
+    if (!debuggedName) {
+      debuggedName = creep.name;
+    }
+    if (debuggedName === creep.name) {
+      // creep.say('Hey');
+      // console.log(JSON.stringify(creep.memory.bt, undefined, 4));
+    }
   }
 }

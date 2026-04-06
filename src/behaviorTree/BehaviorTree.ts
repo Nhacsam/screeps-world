@@ -3,7 +3,7 @@ import { Node } from './Node';
 import { TreeBuilder } from './wrappers';
 
 export class BehaviorTree<A, Context> {
-  private rootNode: Node<A, Context>;
+  protected rootNode: Node<A, Context>;
 
   constructor(getMemory: () => NodeMemory, agent: A, builder: TreeBuilder<A, Context>) {
     this.rootNode = builder(getMemory, agent);
@@ -26,7 +26,7 @@ export class BehaviorTree<A, Context> {
     try {
       this.rootNode.step(context);
     } catch (exception) {
-      console.error(exception);
+      console.log(exception);
     }
   }
 
