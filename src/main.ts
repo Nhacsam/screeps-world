@@ -1,6 +1,6 @@
 import { runCreep, cleanupDeadCreeps } from './creepAgent';
 import { CityInfo } from './room/CityInfo';
-import { RoomPlanner, initRoomPlanMemory } from './room/RoomPlanner';
+import { RoomPlanner } from './room/RoomPlanner';
 import { center as centerStamp } from './room/stamps/center';
 import { flowerExtension as flowerStamp } from './room/stamps/flowerExtension';
 import { controller as controllerStamp } from './room/stamps/controller';
@@ -31,7 +31,6 @@ export const loop = () => {
 
   if (!roomPlanner) {
     const roomName = Object.values(Game.spawns)[0]!.room.name;
-    initRoomPlanMemory(roomName);
     roomPlanner = new RoomPlanner(roomName, cityInfo, [controllerStamp, centerStamp, flowerStamp]);
   }
   roomPlanner.update();
